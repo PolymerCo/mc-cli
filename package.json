@@ -7,12 +7,13 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "start": "npm run build && node dist/index.js",
-    "compile": "npm run build && pkg . --out-dir out && cp config.json out"
+    "compile": "npm run build && pkg . --out-dir out && cp -n template.config.json out/config.json"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@polymer-co/mc-rcon": "^1.0.0",
+    "@polymer-co/rope": "^0.1.0",
     "commander": "^9.2.0",
     "typescript": "^4.6.4"
   },

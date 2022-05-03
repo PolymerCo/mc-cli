@@ -1,22 +1,31 @@
 import { Command } from 'commander'
 import { existsSync, readFileSync } from 'fs'
 import { McRconAdmin, McRconOptions } from '@polymer-co/mc-rcon'
+import '@polymer-co/rope'
 const program = new Command();
 
 interface Args {
+  command?: string,
   configPath: string,
-  stop?: boolean,
   save?: boolean,
+  silent?: boolean,
+  stop?: boolean,
+  test?: boolean,
+  verbose?: boolean,
   players?: boolean
 }
 
 program
   .option('rcon-cli')
   .option('Provides various utilities for interacting with a Minecraft server via CLI.')
-  .option('--stop', 'stop the minecraft server')
+  .option('--command <string>', 'send an arbitrary command to the server and print the result')
+  .option('-c,--config-path <path>', 'path to the RCON config JSON file', 'config.json')
   .option('--save', 'save the current state to disk')
+  .option('-s,--silent', 'silence all output')
+  .option('--stop', 'stop the minecraft server')
+  .option('-t,--test', 'test connection with server')
+  .option('-v,--verbose', 'outputs messages to indicate non-action program state change')
   .option('--players', 'print a list of the current online players')
-  .option('--config-path <path>', 'path to the RCON config JSON file', 'config.json')
 
 program.parse()
 
@@ -29,35 +38,52 @@ if (!existsSync(args.configPath)) {
 const config = JSON.parse(readFileSync(args.configPath).toString('ascii')) as Partial<McRconOptions>
 const rcon = new McRconAdmin(config)
 
-console.log('connecting to RCON service..')
+!args.silent && args.verbose && console.log('connecting to RCON service..')
 
 rcon.connect().then(async () => {
-  console.log('connected via RCON.')
+  !args.silent && args.verbose && console.log('connected via RCON.')
+
+  if (args.test) {
+    !args.silent && console.log('connection successful! exiting')
+    process.exit(0)
+  }
+
+  if (args.command && !args.command.isEmptyOrWhitespace()) {
+    !args.silent && console.log(`sending command: ${args.command}`)
+    const result = await rcon.command(args.command)
+    
+    if (result && !result.isEmptyOrWhitespace()) {
+      console.log(`successful: ${result}`)
+    } else {
+      console.log('successful')
+    }
+  }
 
   if (args.players) {
     const players = await rcon.list()
     const count = players.length
 
-    console.log(`-- ${count} player${count == 1 ? '' : 's'} online`)
+    !args.silent && console.log(`-- ${count} player${count == 1 ? '' : 's'} online`)
 
     players.forEach(player => {
-      console.log(`${player.name}: ${player.uuid}`)
+      !args.silent && console.log(`${player.name}: ${player.uuid}`)
     })
   }
 
   if (args.save) {
-    console.log('saving world..')
+    !args.silent && console.log('saving world..')
     await rcon.saveAll(true)
-    console.log('world saved.')
+    !args.silent && console.log('world saved.')
   }
 
   if (args.stop) {
-    console.log('stopping server..')
+    !args.silent && console.log('stopping server..')
     await rcon.stop()
-    console.log('server stopped.')
+    !args.silent && console.log('server stopped.')
   }
 
-  console.log('disconnecting from RCON.')
+  !args.silent && args.verbose && console.log('disconnecting from RCON.')
 
-  rcon.disconnect()
+  await rcon.disconnect()
+  process.exit(0)
 })
