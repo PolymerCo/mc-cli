@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "start": "npm run build && node dist/index.js",
-    "compile": "cp config.json out && npm run build && pkg . --out-dir out"
+    "compile": "npm run build && pkg . --out-dir out && cp config.json out"
   },
   "author": "",
   "license": "ISC",
