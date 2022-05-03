@@ -6,7 +6,8 @@
   "bin": "dist/index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/index.js",
+    "compile": "cp config.json out && npm run build && pkg . --out-dir out"
   },
   "author": "",
   "license": "ISC",
