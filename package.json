@@ -1,0 +1,20 @@
+{
+  "name": "@polymer-co/mc-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "npm run build && node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@polymer-co/mc-rcon": "^1.0.0",
+    "commander": "^9.2.0",
+    "typescript": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.30"
+  }
+}
