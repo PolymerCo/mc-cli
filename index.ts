@@ -57,5 +57,7 @@ rcon.connect().then(async () => {
     console.log('server stopped.')
   }
 
+  console.log('disconnecting from RCON.')
+
   rcon.disconnect()
 })
